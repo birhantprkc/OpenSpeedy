@@ -27,7 +27,7 @@
     "cancel": "取消"
   },
   "process": {
-    "title": "系统进程",
+    "title": "进程列表",
     "search": "搜索进程名、PID 或窗口标题…",
     "pid": "PID",
     "name": "进程名称",
@@ -43,6 +43,8 @@
     "injectFail": "注入失败，请检查是否以管理员身份运行",
     "enableFail": "启用加速失败",
     "disableFail": "禁用加速失败",
+    "showSystem": "显示系统进程",
+
     "detail": {
       "title": "进程详情",
       "pid": "进程 ID",

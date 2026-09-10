@@ -27,7 +27,7 @@
     "cancel": "Annuleren"
   },
   "process": {
-    "title": "Systeemprocessen",
+    "title": "Proceslijst",
     "search": "Zoek op naam, PID of venstertitel…",
     "pid": "PID",
     "name": "Procesnaam",
@@ -43,6 +43,8 @@
     "injectFail": "Injectie mislukt – voer uit als administrator",
     "enableFail": "Snelheid inschakelen mislukt",
     "disableFail": "Snelheid uitschakelen mislukt",
+    "showSystem": "Systeemprocessen tonen",
+
     "detail": {
       "title": "Procesdetails",
       "pid": "Proces-ID",

@@ -27,7 +27,7 @@
     "cancel": "Cancelar"
   },
   "process": {
-    "title": "Procesos del Sistema",
+    "title": "Lista de procesos",
     "search": "Buscar por nombre, PID o título de ventana…",
     "pid": "PID",
     "name": "Nombre del proceso",
@@ -43,6 +43,8 @@
     "injectFail": "Fallo de inyección – ejecute como administrador",
     "enableFail": "Error al activar velocidad",
     "disableFail": "Error al desactivar velocidad",
+    "showSystem": "Mostrar procesos del sistema",
+
     "detail": {
       "title": "Detalles del Proceso",
       "pid": "ID del Proceso",

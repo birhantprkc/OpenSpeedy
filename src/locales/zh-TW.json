@@ -27,7 +27,7 @@
     "cancel": "取消"
   },
   "process": {
-    "title": "系統程式",
+    "title": "處理程序清單",
     "search": "搜尋程式名稱、PID 或視窗標題...",
     "pid": "PID",
     "name": "程式名稱",
@@ -43,6 +43,8 @@
     "injectFail": "注入失敗，請檢查是否以系統管理員身分執行",
     "enableFail": "啟用加速失敗",
     "disableFail": "停用加速失敗",
+    "showSystem": "顯示系統處理程序",
+
     "detail": {
       "title": "程式詳情",
       "pid": "程式 ID",

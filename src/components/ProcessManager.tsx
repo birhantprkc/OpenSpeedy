@@ -5,12 +5,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useInterval } from "ahooks";
 import { Splitter } from "antd";
 import {
-  Box, Paper, Typography, Avatar, Switch, TextField,
+  Box, Paper, Typography, Avatar, Switch, TextField, IconButton, Tooltip,
   Divider, Table, TableCell, TableHead, TableRow, Tabs, Tab,
 } from "@mui/material";
 import WindowIcon from "@mui/icons-material/Window";
 import SearchIcon from "@mui/icons-material/Search";
 import MemoryIcon from "@mui/icons-material/Memory";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import SpeedPanel from "./SpeedPanel";
 import ProcessDetail from "./ProcessDetail";
 import { useSettings, useSpeed } from "../hooks/useSettings";
@@ -91,7 +93,7 @@ const ProcessRow = React.memo(function ProcessRow({
 
 const ProcessTable = function ProcessTable({
   processes, filtered, search, onSearch, icons, enabled, selectedPid, onToggle, onSelect,
-  nameGroups, nameFiltered, onToggleName, tab, onTabChange,
+  nameGroups, nameFiltered, onToggleName, tab, onTabChange, showSystem, onShowSystemChange,
 }: {
   processes: ProcessInfo[];
   filtered: ProcessInfo[];
@@ -107,18 +109,21 @@ const ProcessTable = function ProcessTable({
   onToggleName: (name: string) => void;
   tab: number;
   onTabChange: (v: number) => void;
+  showSystem: boolean;
+  onShowSystemChange: (v: boolean) => void;
 }) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const isPid = tab === 0;
+  // Tab 0 = grouped by name (default), tab 1 = per-PID list
+  const isPid = tab === 1;
 
   // ── Sorting ──────────────────────────────────────────────────────────
-  const [sortCol, setSortCol] = useState<SortCol>(isPid ? "memory" : null);
-  const [sortAsc, setSortAsc] = useState(false);
+  // Default: PID mode by memory descending, name mode by name ascending
+  const [sortCol, setSortCol] = useState<SortCol>(isPid ? "memory" : "name");
+  const [sortAsc, setSortAsc] = useState(!isPid);
 
-  // Default: isPid mode sorts by memory descending, name mode no sort
-  useEffect(() => { setSortCol(isPid ? "memory" : null); setSortAsc(false); }, [tab]);
+  useEffect(() => { setSortCol(isPid ? "memory" : "name"); setSortAsc(!isPid); }, [tab]);
 
   function toggleSort(col: SortCol) {
     if (sortCol === col) { setSortAsc(!sortAsc); } else { setSortCol(col); setSortAsc(true); }
@@ -170,11 +175,22 @@ const ProcessTable = function ProcessTable({
         <MemoryIcon sx={{ color: "primary.main", fontSize: 18, mr: 1 }} />
         <Typography variant="caption" sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, color: "text.secondary" }}>{t("process.title")}</Typography>
         <Typography variant="caption" sx={{ ml: 1, fontWeight: 600, color: "primary.main" }}>{items} / {total}</Typography>
+        <Tooltip title={t("process.showSystem")}>
+          <IconButton
+            size="small"
+            aria-label={t("process.showSystem")}
+            aria-pressed={showSystem}
+            onClick={() => onShowSystemChange(!showSystem)}
+            sx={{ ml: 0.5, color: showSystem ? "primary.main" : "text.disabled" }}
+          >
+            {showSystem ? <VisibilityIcon sx={{ fontSize: 18 }} /> : <VisibilityOffIcon sx={{ fontSize: 18 }} />}
+          </IconButton>
+        </Tooltip>
         <Box sx={{ flex: 1 }} />
         <Tabs value={tab} onChange={(_, v) => { onTabChange(v); scrollRef.current?.scrollTo(0, 0); }}
           sx={{ minHeight: 0, "& .MuiTab-root": { minHeight: 32, py: 0, fontSize: "0.75rem" } }}>
-          <Tab label={t("process.byPid")} />
           <Tab label={t("process.byName")} />
+          <Tab label={t("process.byPid")} />
         </Tabs>
       </Box>
 
@@ -257,6 +273,9 @@ export default function ProcessManager() {
   const [speedMap, setSpeedMap] = useState<Map<number, SpeedState>>(new Map());
   const [selectedPid, setSelectedPid] = useState<number | null>(null);
   const [tab, setTab] = useState(0);
+  // Off by default — protected system processes report 0 memory because their
+  // handle cannot be opened
+  const [showSystem, setShowSystem] = useState(false);
   const { settings } = useSettings();
   const { speed, setSpeed, commitSpeed } = useSpeed();
 
@@ -315,17 +334,23 @@ export default function ProcessManager() {
     }
   }, 1000);
 
+  // Hide protected system processes (memory 0 = handle could not be opened)
+  const visibleProcesses = useMemo(
+    () => (showSystem ? processes : processes.filter(p => p.memory_kb > 0)),
+    [processes, showSystem],
+  );
+
   // Filter
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return processes;
-    return processes.filter(p => p.name.toLowerCase().includes(q) || p.pid.toString().includes(q) || (p.window_title && p.window_title.toLowerCase().includes(q)));
-  }, [processes, search]);
+    if (!q) return visibleProcesses;
+    return visibleProcesses.filter(p => p.name.toLowerCase().includes(q) || p.pid.toString().includes(q) || (p.window_title && p.window_title.toLowerCase().includes(q)));
+  }, [visibleProcesses, search]);
 
   // Name grouping (for name-based toggle)
   const nameGroups = useMemo(() => {
     const map = new Map<string, { count: number; arch: string; pids: number[]; anyEnabled: boolean }>();
-    for (const p of processes) {
+    for (const p of visibleProcesses) {
       const key = p.name.toLowerCase();
       const cur = map.get(key) || { count: 0, arch: p.arch, pids: [], anyEnabled: false };
       cur.count++;
@@ -334,7 +359,7 @@ export default function ProcessManager() {
       map.set(key, cur);
     }
     return map;
-  }, [processes, speedMap]);
+  }, [visibleProcesses, speedMap]);
 
   const nameFiltered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -401,11 +426,12 @@ export default function ProcessManager() {
         <Splitter style={{ height: "100%" }}>
           <Splitter.Panel defaultSize="60%" min="300px">
             <ProcessTable
-              processes={processes} filtered={filtered} search={search} onSearch={setSearch}
+              processes={visibleProcesses} filtered={filtered} search={search} onSearch={setSearch}
               icons={icons} enabled={enabled} selectedPid={selectedPid}
               onToggle={toggle} onSelect={setSelectedPid}
               nameGroups={nameGroups} nameFiltered={nameFiltered} onToggleName={toggleName}
               tab={tab} onTabChange={setTab}
+              showSystem={showSystem} onShowSystemChange={setShowSystem}
             />
           </Splitter.Panel>
           <Splitter.Panel min="250px">

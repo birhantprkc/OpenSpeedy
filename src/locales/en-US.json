@@ -27,7 +27,7 @@
     "cancel": "cancel"
   },
   "process": {
-    "title": "System Processes",
+    "title": "Process List",
     "search": "Search by name, PID, or window title…",
     "pid": "PID",
     "name": "Process Name",
@@ -43,6 +43,8 @@
     "injectFail": "Injection failed, try running as administrator",
     "enableFail": "Failed to enable speed",
     "disableFail": "Failed to disable speed",
+    "showSystem": "Show system processes",
+
     "detail": {
       "title": "Process Detail",
       "pid": "Process ID",

@@ -27,7 +27,7 @@
     "cancel": "Abbrechen"
   },
   "process": {
-    "title": "Systemprozesse",
+    "title": "Prozessliste",
     "search": "Nach Name, PID oder Fenstertitel suchen…",
     "pid": "PID",
     "name": "Prozessname",
@@ -43,6 +43,8 @@
     "injectFail": "Injektion fehlgeschlagen – als Administrator ausführen",
     "enableFail": "Aktivierung fehlgeschlagen",
     "disableFail": "Deaktivierung fehlgeschlagen",
+    "showSystem": "Systemprozesse anzeigen",
+
     "detail": {
       "title": "Prozessdetails",
       "pid": "Prozess-ID",

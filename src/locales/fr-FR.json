@@ -27,7 +27,7 @@
     "cancel": "Annuler"
   },
   "process": {
-    "title": "Processus Système",
+    "title": "Liste des processus",
     "search": "Rechercher par nom, PID ou titre de fenêtre…",
     "pid": "PID",
     "name": "Nom du processus",
@@ -43,6 +43,8 @@
     "injectFail": "Échec de l'injection – exécutez en tant qu'administrateur",
     "enableFail": "Échec de l'activation",
     "disableFail": "Échec de la désactivation",
+    "showSystem": "Afficher les processus système",
+
     "detail": {
       "title": "Détails du Processus",
       "pid": "ID du Processus",

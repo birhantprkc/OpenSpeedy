@@ -27,7 +27,7 @@
     "cancel": "キャンセル"
   },
   "process": {
-    "title": "システムプロセス",
+    "title": "プロセス一覧",
     "search": "プロセス名、PID、ウィンドウタイトルで検索…",
     "pid": "PID",
     "name": "プロセス名",
@@ -43,6 +43,8 @@
     "injectFail": "注入に失敗しました。管理者として実行してください",
     "enableFail": "加速の有効化に失敗しました",
     "disableFail": "加速の無効化に失敗しました",
+    "showSystem": "システムプロセスを表示",
+
     "detail": {
       "title": "プロセス詳細",
       "pid": "プロセス ID",
