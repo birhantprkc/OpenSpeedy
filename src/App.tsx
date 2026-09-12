@@ -15,6 +15,7 @@ import TitleBar from "./components/TitleBar";
 import appIcon from "../src-tauri/icons/icon.png";
 import githubIcon from "./assets/github.svg";
 import bmcIcon from "./assets/bmc.svg";
+import steamIcon from "./assets/steam.svg";
 import ProcessManager from "./components/ProcessManager";
 import SettingsManager from "./components/SettingsManager";
 import { useShortcut } from "./hooks/useShortcut";
@@ -255,7 +256,22 @@ function App() {
 
                   <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", justifyContent: "center" }}>
                     <IconButton
+                      onClick={() => open("https://store.steampowered.com/app/5010920/OpenSpeedy")}
+                      title={t("about.socialSteam")}
+                      aria-label={t("about.socialSteam")}
+                      sx={{
+                        width: 44, height: 44,
+                        border: 1, borderColor: "divider",
+                        bgcolor: darkMode ? "rgba(255,255,255,0.92)" : "background.paper",
+                        "&:hover": { bgcolor: darkMode ? "rgba(255,255,255,0.76)" : "action.hover", borderColor: "primary.main" },
+                      }}
+                    >
+                      <Box component="img" src={steamIcon} sx={{ width: 22, height: 22 }} />
+                    </IconButton>
+                    <IconButton
                       onClick={() => open("https://github.com/game1024")}
+                      title={t("about.socialGithub")}
+                      aria-label={t("about.socialGithub")}
                       sx={{
                         width: 44, height: 44,
                         border: 1, borderColor: "divider",
@@ -267,6 +283,8 @@ function App() {
                     </IconButton>
                     <IconButton
                       onClick={() => open("https://buymeacoffee.com/game1024")}
+                      title={t("about.socialBmc")}
+                      aria-label={t("about.socialBmc")}
                       sx={{
                         width: 44, height: 44,
                         border: 1, borderColor: "divider",
