@@ -1,3 +1,4 @@
+pub mod applog;
 mod bridge_client;
 mod process_enumerator;
 mod system_stats;
@@ -20,30 +21,50 @@ unsafe extern "system" fn ctrlc_handler(_ctrl_type: u32) -> BOOL {
 }
 
 fn ensure_bridges() {
-    let mut children = BRIDGE_CHILDREN.lock().unwrap();
-    if !children.is_empty() { return; }
+    // A poisoned lock here used to panic the whole process; the bridge list is
+    // bookkeeping, so recover the data instead.
+    let mut children = match BRIDGE_CHILDREN.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            applog::warn("bridge", "BRIDGE_CHILDREN mutex was poisoned, recovering");
+            poisoned.into_inner()
+        }
+    };
+    if !children.is_empty() {
+        applog::info("bridge", "bridges already started — skipping");
+        return;
+    }
 
     let exe_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|d| d.to_path_buf()))
         .unwrap_or_default();
+    applog::info("bridge", format!("looking for bridge binaries in {}", exe_dir.display()));
 
     for name in &["bridge64.exe", "bridge32.exe"] {
         let path = exe_dir.join(name);
         let log_path = exe_dir.join(format!("{name}.log"));
-        if path.exists() {
-            let stderr = std::fs::File::create(&log_path)
-                .map(std::process::Stdio::from)
-                .unwrap_or_else(|_| std::process::Stdio::null());
-            match std::process::Command::new(&path)
-                .stdin(std::process::Stdio::null())
-                .stdout(std::process::Stdio::null())
-                .stderr(stderr)
-                .spawn()
-            {
-                Ok(child) => children.push(child),
-                Err(_) => {}
+        if !path.exists() {
+            applog::warn("bridge", format!("{name} not found at {} — skipped", path.display()));
+            continue;
+        }
+        let stderr = std::fs::File::create(&log_path)
+            .map(std::process::Stdio::from)
+            .unwrap_or_else(|e| {
+                applog::warn("bridge", format!("cannot create {}: {e}", log_path.display()));
+                std::process::Stdio::null()
+            });
+        match std::process::Command::new(&path)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(stderr)
+            .spawn()
+        {
+            Ok(child) => {
+                applog::info("bridge", format!("spawned {} as pid {}", name, child.id()));
+                children.push(child);
             }
+            Err(e) => applog::error("bridge", format!("failed to spawn {}: {e}", path.display())),
         }
     }
 
@@ -53,11 +74,17 @@ fn ensure_bridges() {
         ("bridge32", bridge_client::bridge32_health as fn() -> bool),
     ];
     for (name, check) in &health_checks {
-        for _ in 0..20 {
-            if check() { break; }
+        let start = std::time::Instant::now();
+        let mut ok = check();
+        while !ok && start.elapsed() < std::time::Duration::from_secs(2) {
             std::thread::sleep(std::time::Duration::from_millis(100));
+            ok = check();
         }
-        eprintln!("[startup] {name} health: {}", check());
+        if ok {
+            applog::info("bridge", format!("{name} ready after {} ms", start.elapsed().as_millis()));
+        } else {
+            applog::error("bridge", format!("{name} did not become ready within 2 s — speed patching will not work"));
+        }
     }
 }
 
@@ -66,6 +93,7 @@ fn shutdown_bridges() {
     // block if the bridge is busy processing a long-running command.
     if let Ok(mut children) = BRIDGE_CHILDREN.lock() {
         for mut child in children.drain(..) {
+            applog::info("bridge", format!("killing bridge pid {}", child.id()));
             let _ = child.kill();
             let _ = child.wait();
         }
@@ -166,9 +194,31 @@ async fn set_always_on_top(window: tauri::Window, on_top: bool) {
     let _ = window.set_always_on_top(on_top);
 }
 
+/// Path of the diagnostics log, so the UI can reveal it in Explorer.
+#[tauri::command(async)]
+async fn get_log_path() -> String {
+    applog::log_path_string()
+}
+
+/// Sink for frontend errors (`window.onerror`, unhandled rejections, React
+/// render errors) so they end up in the same file as the Rust-side diagnostics.
+#[tauri::command(async)]
+async fn report_frontend_error(source: String, message: String, stack: Option<String>) {
+    match stack.filter(|s| !s.trim().is_empty()) {
+        Some(stack) => applog::error("frontend", format!("{source}: {message}\n{stack}")),
+        None => applog::error("frontend", format!("{source}: {message}")),
+    }
+}
+
+/// Start the GUI. Returns `Err` instead of panicking so the caller can write
+/// the failure to the log and show it to the user — a panic here would make the
+/// process disappear with no console and no trace.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
+pub fn run() -> Result<(), String> {
+    // Idempotent — own entry point is `main.rs`, this covers any other caller.
+    applog::init();
+
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -176,9 +226,11 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::Builder::default().build())
         .plugin(tauri_plugin_shell::init())
         .setup(|_app| {
+            applog::info("setup", "tauri setup callback entered");
             ensure_bridges();
             // Register Ctrl+C handler so bridges are killed on console exit
             unsafe { let _ = SetConsoleCtrlHandler(Some(ctrlc_handler), true); }
+            applog::info("setup", "startup complete");
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -196,13 +248,22 @@ pub fn run() {
             bridge_disable,
             bridge_get_status,
             set_always_on_top,
+            get_log_path,
+            report_frontend_error,
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .build(tauri::generate_context!())
-        .expect("error while building tauri application")
-        .run(|_app_handle, event| {
-            if let tauri::RunEvent::Exit = event {
-                shutdown_bridges();
-            }
-        });
+        .map_err(|e| format!("failed to build the application (window/WebView2): {e}"))?;
+
+    applog::info("startup", "app built, entering event loop");
+
+    app.run(|_app_handle, event| {
+        if let tauri::RunEvent::Exit = event {
+            applog::info("shutdown", "exit requested, stopping bridges");
+            shutdown_bridges();
+        }
+    });
+
+    applog::info("shutdown", "event loop finished");
+    Ok(())
 }

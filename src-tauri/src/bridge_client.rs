@@ -53,7 +53,15 @@ fn cache_for(pipe: &str) -> &Mutex<Option<isize>> {
 /// attempt.
 fn pipe_command(pipe: &str, cmd: &str) -> Option<String> {
     let cache = cache_for(pipe);
-    let mut guard = cache.lock().unwrap();
+    // Recover from a poisoned lock — losing the cached handle only costs one
+    // reconnect, while panicking here would take down the whole app.
+    let mut guard = match cache.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            crate::applog::warn("bridge", format!("{pipe} mutex was poisoned, recovering"));
+            poisoned.into_inner()
+        }
+    };
 
     // Try the cached handle first
     if let Some(raw) = *guard {
@@ -61,8 +69,12 @@ fn pipe_command(pipe: &str, cmd: &str) -> Option<String> {
         match send_recv(h, cmd) {
             Ok(resp) => return Some(resp),
             Err(_) => {
-                // Pipe broken — close the stale handle and reconnect
-                eprintln!("[bridge] {cmd} → pipe broken, reconnecting…");
+                // Pipe broken — close the stale handle and reconnect on the
+                // next command.
+                crate::applog::warn(
+                    "bridge",
+                    format!("{pipe}: connection dropped while running {cmd}, reconnecting"),
+                );
                 unsafe { let _ = CloseHandle(h); }
                 *guard = None;
             }
@@ -70,7 +82,16 @@ fn pipe_command(pipe: &str, cmd: &str) -> Option<String> {
     }
 
     // Open a new connection
-    let h = open_pipe(pipe)?;
+    let h = match open_pipe(pipe) {
+        Some(h) => h,
+        None => {
+            crate::applog::warn(
+                "bridge",
+                format!("{pipe}: cannot connect — bridge process is not running or refused the pipe"),
+            );
+            return None;
+        }
+    };
     match send_recv(h, cmd) {
         Ok(resp) => {
             *guard = Some(handle_val(h)); // cache for next command
@@ -78,7 +99,7 @@ fn pipe_command(pipe: &str, cmd: &str) -> Option<String> {
         }
         Err(_) => {
             unsafe { let _ = CloseHandle(h); }
-            eprintln!("[bridge] {cmd} → pipe read failed on new connection");
+            crate::applog::warn("bridge", format!("{pipe}: {cmd} failed on a fresh connection"));
             None
         }
     }

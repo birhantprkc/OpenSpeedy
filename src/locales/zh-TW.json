@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "顯示視窗",
-    "quit": "結束"
+    "quit": "結束",
+    "logs": "開啟日誌目錄"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "啟用加速失敗",
     "disableFail": "停用加速失敗",
     "showSystem": "顯示系統處理程序",
-
     "detail": {
       "title": "程式詳情",
       "pid": "程式 ID",
@@ -105,6 +105,7 @@
     "socialLinks": "社交連結",
     "copyInfoSuccess": "已複製軟體資訊，準備貼上到問題報告。",
     "copyInfoError": "複製軟體資訊失敗，請手動複製。",
-    "copyInfo": "軟體資訊"
+    "copyInfo": "軟體資訊",
+    "openLog": "開啟日誌"
   }
 }

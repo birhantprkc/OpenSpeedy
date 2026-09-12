@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "显示窗口",
-    "quit": "退出"
+    "quit": "退出",
+    "logs": "打开日志目录"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "启用加速失败",
     "disableFail": "禁用加速失败",
     "showSystem": "显示系统进程",
-
     "detail": {
       "title": "进程详情",
       "pid": "进程 ID",
@@ -103,6 +103,7 @@
     "socialLinks": "社交链接",
     "copyInfoSuccess": "已复制软件信息，准备粘贴到问题报告。",
     "copyInfoError": "复制软件信息失败，请手动复制。",
-    "copyInfo": "软件信息"
+    "copyInfo": "软件信息",
+    "openLog": "打开日志"
   }
 }

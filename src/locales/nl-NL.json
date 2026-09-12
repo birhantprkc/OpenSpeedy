@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "Venster tonen",
-    "quit": "Afsluiten"
+    "quit": "Afsluiten",
+    "logs": "Logmap openen"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "Snelheid inschakelen mislukt",
     "disableFail": "Snelheid uitschakelen mislukt",
     "showSystem": "Systeemprocessen tonen",
-
     "detail": {
       "title": "Procesdetails",
       "pid": "Proces-ID",
@@ -103,6 +103,7 @@
     "socialLinks": "Sociale links",
     "copyInfoSuccess": "Systeeminfo gekopieerd. Klaar om te plakken.",
     "copyInfoError": "Kopiëren mislukt. Kopieer handmatig.",
-    "copyInfo": "Systeeminfo"
+    "copyInfo": "Systeeminfo",
+    "openLog": "Log openen"
   }
 }

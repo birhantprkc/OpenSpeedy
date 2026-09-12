@@ -28,6 +28,13 @@ pub struct SystemStats {
     pub gpu: Option<GpuStats>,
 }
 
+/// OS name for the startup banner — the condensed form, without the build
+/// number the About tab shows.
+pub fn os_name_for_log() -> String {
+    let full = os_version();
+    full.split(' ').next().unwrap_or("Windows").to_string()
+}
+
 fn os_version() -> String {
     static CACHED: OnceLock<String> = OnceLock::new();
     CACHED.get_or_init(|| {

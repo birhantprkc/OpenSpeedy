@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "ウィンドウを表示",
-    "quit": "終了"
+    "quit": "終了",
+    "logs": "ログフォルダを開く"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "加速の有効化に失敗しました",
     "disableFail": "加速の無効化に失敗しました",
     "showSystem": "システムプロセスを表示",
-
     "detail": {
       "title": "プロセス詳細",
       "pid": "プロセス ID",
@@ -105,6 +105,7 @@
     "socialLinks": "ソーシャルリンク",
     "copyInfoSuccess": "システム情報をコピーしました。問題報告に貼り付けてください。",
     "copyInfoError": "システム情報のコピーに失敗しました。手動でコピーしてください。",
-    "copyInfo": "システム情報"
+    "copyInfo": "システム情報",
+    "openLog": "ログを開く"
   }
 }

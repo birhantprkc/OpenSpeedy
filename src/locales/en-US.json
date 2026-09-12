@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "Show Window",
-    "quit": "Quit"
+    "quit": "Quit",
+    "logs": "Open Log Folder"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "Failed to enable speed",
     "disableFail": "Failed to disable speed",
     "showSystem": "Show system processes",
-
     "detail": {
       "title": "Process Detail",
       "pid": "Process ID",
@@ -103,6 +103,7 @@
     "socialLinks": "Social Links",
     "copyInfoSuccess": "System info copied. Ready to paste into issue report.",
     "copyInfoError": "Failed to copy system info. Please copy manually.",
-    "copyInfo": "System Info"
+    "copyInfo": "System Info",
+    "openLog": "Open Log"
   }
 }

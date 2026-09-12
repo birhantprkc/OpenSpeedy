@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "Mostrar janela",
-    "quit": "Sair"
+    "quit": "Sair",
+    "logs": "Abrir pasta de logs"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "Falha ao ativar velocidade",
     "disableFail": "Falha ao desativar velocidade",
     "showSystem": "Mostrar processos do sistema",
-
     "detail": {
       "title": "Detalhes do Processo",
       "pid": "ID do Processo",
@@ -103,6 +103,7 @@
     "socialLinks": "Links sociais",
     "copyInfoSuccess": "Informações do sistema copiadas. Pronto para colar no relatório.",
     "copyInfoError": "Falha ao copiar. Copie manualmente.",
-    "copyInfo": "Info do sistema"
+    "copyInfo": "Info do sistema",
+    "openLog": "Abrir log"
   }
 }

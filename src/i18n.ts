@@ -77,8 +77,12 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
-// On startup: use system language unless user explicitly chose a different one
-(async () => {
+// On startup: use system language unless user explicitly chose a different one.
+// The result only lands a few awaits in, so UI that renders text outside the
+// React tree (the tray menu is built imperatively) must await `languageReady`
+// instead of reading `i18n.language` eagerly — otherwise a first run, where the
+// settings file still has to be created, renders in the default `en-US`.
+async function setupLanguage(): Promise<void> {
   const sysLocale = await locale();
   const detected = mapSystemLocale(sysLocale);
 
@@ -94,8 +98,14 @@ i18n.use(initReactI18next).init({
     : detected;
 
   if (lang !== i18n.language) {
-    i18n.changeLanguage(lang);
+    await i18n.changeLanguage(lang);
   }
-})();
+}
+
+/** Settles once the startup language is in effect. */
+export const languageReady: Promise<void> = setupLanguage().catch(() => {
+  // Unreadable locale or settings: keep the built-in fallback rather than
+  // leaving every awaiting caller hanging on a rejected promise.
+});
 
 export default i18n;

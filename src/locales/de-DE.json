@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "Fenster anzeigen",
-    "quit": "Beenden"
+    "quit": "Beenden",
+    "logs": "Protokollordner öffnen"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "Aktivierung fehlgeschlagen",
     "disableFail": "Deaktivierung fehlgeschlagen",
     "showSystem": "Systemprozesse anzeigen",
-
     "detail": {
       "title": "Prozessdetails",
       "pid": "Prozess-ID",
@@ -105,6 +105,7 @@
     "socialLinks": "Soziale Links",
     "copyInfoSuccess": "Systeminformationen kopiert. Bereit zum Einfügen.",
     "copyInfoError": "Kopieren fehlgeschlagen. Bitte manuell kopieren.",
-    "copyInfo": "Systeminfo"
+    "copyInfo": "Systeminfo",
+    "openLog": "Protokoll öffnen"
   }
 }

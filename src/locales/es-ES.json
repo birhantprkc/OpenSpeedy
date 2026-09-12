@@ -1,7 +1,8 @@
 {
   "tray": {
     "show": "Mostrar ventana",
-    "quit": "Salir"
+    "quit": "Salir",
+    "logs": "Abrir carpeta de registros"
   },
   "app": {
     "title": "OpenSpeedy",
@@ -44,7 +45,6 @@
     "enableFail": "Error al activar velocidad",
     "disableFail": "Error al desactivar velocidad",
     "showSystem": "Mostrar procesos del sistema",
-
     "detail": {
       "title": "Detalles del Proceso",
       "pid": "ID del Proceso",
@@ -103,6 +103,7 @@
     "socialLinks": "Enlaces sociales",
     "copyInfoSuccess": "Información del sistema copiada. Lista para pegar en el informe.",
     "copyInfoError": "Error al copiar. Copie manualmente.",
-    "copyInfo": "Info del sistema"
+    "copyInfo": "Info del sistema",
+    "openLog": "Abrir registro"
   }
 }

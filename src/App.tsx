@@ -25,6 +25,9 @@ import { useSnackbar } from "./contexts/SnackbarContext";
 import { useInterval } from "ahooks";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-shell";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import BugReportIcon from "@mui/icons-material/BugReport";
+import { reportError } from "./utils/frontendLog";
 
 function App() {
   const { t } = useTranslation();
@@ -67,6 +70,16 @@ function App() {
       notify(t("about.copyInfoSuccess"), "success");
     } catch (error) {
       notify(t("about.copyInfoError"), "error");
+    }
+  };
+
+  // Reveal the diagnostics log in Explorer, with the file selected so the user
+  // knows exactly which file to send.
+  const handleOpenLogs = async () => {
+    try {
+      await revealItemInDir(await invoke<string>("get_log_path"));
+    } catch (e) {
+      await reportError("openLog", String(e));
     }
   };
 
@@ -213,7 +226,7 @@ function App() {
 
                   </Paper>
 
-                  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mt: 2 }}>
                     <Button
                       variant="contained"
                       color="primary"
@@ -222,6 +235,15 @@ function App() {
                       sx={{ textTransform: "none" }}
                     >
                       {t("about.copyInfo")}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<BugReportIcon />}
+                      onClick={handleOpenLogs}
+                      sx={{ textTransform: "none" }}
+                    >
+                      {t("about.openLog")}
                     </Button>
                   </Box>
 
