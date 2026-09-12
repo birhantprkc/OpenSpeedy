@@ -113,6 +113,11 @@ openspeedy
 访问 [安装页面](https://github.com/game1024/OpenSpeedy/releases) 下载最新版本
 
 
+🎮 **方式3: Steam（可选）**
+
+在 [Steam 商店](https://store.steampowered.com/app/5010920/OpenSpeedy) 获取，此为可选的安装方式。
+
+
 # 💻 操作系统要求
 - OS: Windows10 以上
 - 平台：x86（32位） 和 x64 （64位）

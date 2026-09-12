@@ -99,6 +99,10 @@ openspeedy
 📥 **Método 2: Download Manual**
 Acesse a [página de Releases](https://github.com/game1024/OpenSpeedy/releases) para baixar a versão mais recente.
 
+🎮 **Método 3: Steam (opcional)**
+
+Disponível na [loja da Steam](https://store.steampowered.com/app/5010920/OpenSpeedy). Esta é uma forma opcional de instalação.
+
 # 💻 Requisitos do Sistema
 
 - SO: Windows 10 ou superior

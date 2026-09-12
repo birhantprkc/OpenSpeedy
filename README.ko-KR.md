@@ -113,6 +113,11 @@ openspeedy
 [릴리스 페이지](https://github.com/game1024/OpenSpeedy/releases)에서 최신 버전을 다운로드하세요.
 
 
+🎮 **방법 3: Steam (선택)**
+
+[Steam 상점](https://store.steampowered.com/app/5010920/OpenSpeedy)에서 받을 수 있습니다. 선택 사항인 설치 방법입니다.
+
+
 # 💻 시스템 요구 사항
 - OS: Windows 10 이상
 - 플랫폼: x86 (32비트) 및 x64 (64비트)
